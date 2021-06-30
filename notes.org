@@ -1,0 +1,13 @@
+* Org mode to keep track of work needed to do
+
+ + read https://orgmode.org/manual/index.html
+ + read GTD manual for emacs https://orgmode.org/worg/org-gtd-etc.html
+
+* From Jorge
+  Run case for 208Pb for the original PREX parameters
+  Z =  82 (number of protons)
+  N = 126 (number of neutrons)
+  E = 1.06 GeV (electron incident energy)
+  th_max =15 degress (maximum scattering angle)
+  Rch = 5.501 fm (charge radius)
+  Rwk = Rch +0.3 fm (weak charge radius)

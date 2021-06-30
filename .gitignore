@@ -1,0 +1,14 @@
+*.ipynb
+*.pyc
+
+data/
+*.zip
+*.xz
+*.gz
+*.tgz
+pdf/
+
+papers/
+
+.*.swp
+.netrwhist
