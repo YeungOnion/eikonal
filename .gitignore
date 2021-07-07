@@ -12,3 +12,4 @@ papers/
 
 .*.swp
 .netrwhist
+.DS_Store
