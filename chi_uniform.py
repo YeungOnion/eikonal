@@ -34,7 +34,7 @@ N_ = 126
 
 def eta(E):
     kap = np.sqrt(E**2 - m_**2)
-    return E / kap * Z_ * e2_
+    return E / kap * Z * e2_
 
 
 # a useful thing to have around
@@ -42,14 +42,14 @@ def circ(ksi, R=1):
     return np.sqrt(R**2 - ksi**2)
 
 
-def chi_0(b, E, R):
+def chi_0(b, E, R, Z, N):
     kap = np.sqrt(E**2 - m_**2)
     return 2j * eta(E) * np.log(kap * b)
 
 
 # pack into t1 and t2 like in jorges work
 # use np piecwise for vectorized evaluations
-def chi_c1(b, E, R):
+def chi_c1(b, E, R, Z, N):
     kap = np.sqrt(E**2 - m_**2)
 
     def t1(b):
@@ -58,7 +58,7 @@ def chi_c1(b, E, R):
         def leq(b):
             a1 = 4 / 3 * (1 - b**2 / 4) * circ(b)
             a2 = np.log((1 + circ(b)) / b)
-            return -2 * Z_ * e2_ * (a1 - a2)
+            return -2 * Z * e2_ * (a1 - a2)
 
         def geq(b):
             return 0 * b
@@ -68,7 +68,7 @@ def chi_c1(b, E, R):
     return 1j * E / kap * t1(b)
 
 
-def chi_c2(b, E, R):
+def chi_c2(b, E, R, Z, N):
     kap = np.sqrt(E**2 - m_**2)
 
     def t2(b):
@@ -77,37 +77,37 @@ def chi_c2(b, E, R):
         def leq(b):
             a1 = circ(b) * (2 * b**4 - 14 * b**2 + 27) / 15
             a2 = 1 / b * np.arctan(b / circ(b))
-            return 2 * (Z_ * e2_)**2 / R * (a1 + a2)
+            return 2 * (Z * e2_)**2 / R * (a1 + a2)
 
         def geq(b):
-            return (Z_ * e2_)**2 * np.pi / (b * R)
+            return (Z * e2_)**2 * np.pi / (b * R)
 
         return np.piecewise(b, b < 1, [leq, geq])
 
     return -1j / 2 / kap * t2(b)
 
 
-def chi_c(b, E, R):
-    return chi_c1(b, E, R) + chi_c2(b, E, R)
+def chi_c(b, E, R, Z, N):
+    return chi_c1(b, E, R) + chi_c2(b, E, R, Z, N)
 
 
-def chi_so(b, E, R):
+def chi_so(b, E, R, Z, N):
     def tso(b):
         b = b / R
 
         def leq(b):
-            return 2 / (b * R)**2 * (Z_ * e2_) * (1 - circ(b)**3)
+            return 2 / (b * R)**2 * (Z * e2_) * (1 - circ(b)**3)
 
         def geq(b):
-            return 2 / (b * R)**2 * (Z_ * e2_)
+            return 2 / (b * R)**2 * (Z * e2_)
 
         return np.piecewise(b, b < 1, [leq, geq])
 
     return 1j * b / 2 / (E + m_) * tso(b)
 
 
-def chi_a(b, E, R):
-    QW = N_*QW_n_ + Z_*QW_p_
+def chi_a(b, E, R, Z, N):
+    QW = N*QW_n_ + Z*QW_p_
     coef = 1j / 2 / np.sqrt(2) * GF_ * QW
 
     def ta(b):
@@ -137,9 +137,9 @@ def f0_func(q, E, R_ch, R_wk, use_ratio=True):
 
 def F0_func(b, E, R_ch, R_wk):
     kap = np.sqrt(E**2 - m_**2)
-    phase_factor = np.exp(-chi_0(b, E, R_ch))
+    phase_factor = np.exp(-chi_0(b, E, R_ch), Z, N)
     coef = 1j * kap
-    return coef * phase_factor * (1 - np.exp(-chi_c(b, E, R_ch)))
+    return coef * phase_factor * (1 - np.exp(-chi_c(b, E, R_ch)), Z, N)
 
 
 F0_func._name = r'F0'
@@ -148,9 +148,9 @@ F0_func._nu = 0
 
 def F1_func(b, E, R_ch, R_wk):
     kap = np.sqrt(E**2 - m_**2)
-    phase_factor = np.exp(-chi_0(b, E, R_ch))
+    phase_factor = np.exp(-chi_0(b, E, R_ch), Z, N)
     coef = 1j * kap
-    return coef * phase_factor * (1 - np.exp(-chi_c1(b, E, R_ch)))
+    return coef * phase_factor * (1 - np.exp(-chi_c1(b, E, R_ch)), Z, N)
 
 
 F1_func._name = r'F1'
@@ -159,9 +159,9 @@ F1_func._nu = 0
 
 def F2_func(b, E, R_ch, R_wk):
     kap = np.sqrt(E**2 - m_**2)
-    phase_factor = np.exp(-chi_0(b, E, R_ch) - chi_c1(b, E, R_ch))
+    phase_factor = np.exp(-chi_0(b, E, R_ch) - chi_c1(b, E, R_ch), Z, N)
     coef = 1j * kap
-    return coef * phase_factor * (1 - np.exp(-chi_c2(b, E, R_ch)))
+    return coef * phase_factor * (1 - np.exp(-chi_c2(b, E, R_ch)), Z, N)
 
 
 F2_func._name = r'F2'
@@ -170,35 +170,35 @@ F2_func._nu = 0
 
 def Fn_func(b, E, R_ch, R_wk):
     kap = np.sqrt(E**2 - m_**2)
-    phase_factor = np.exp(-chi_0(b, E, R_ch) - chi_c(b, E, R_ch))
+    phase_factor = np.exp(-chi_0(b, E, R_ch) - chi_c(b, E, R_ch), Z, N)
     coef = -kap
-    return coef * phase_factor * chi_so(b, E, R_ch)
+    return coef * phase_factor * chi_so(b, E, R_ch, Z, N)
 
 
 Fn_func._name = r'Fn'
 Fn_func._nu = 1
 
 
-def Fkap_func(b, E, R_ch, R_wk):
+def Fk_func(b, E, R_ch, R_wk):
     kap = np.sqrt(E**2 - m_**2)
-    phase_factor = np.exp(-(chi_0(b, E, R_ch) + chi_c(b, E, R_ch)))
+    phase_factor = np.exp(-(chi_0(b, E, R_ch) + chi_c(b, E, R_ch)), Z, N)
     coef = 1j * kap
-    return coef * phase_factor * chi_a(b, E, R_wk)
+    return coef * phase_factor * chi_a(b, E, R_wk, Z, N)
 
 
-Fkap_func._name = r'Fkap'
-Fkap_func._nu = 0
+Fk_func._name = r'Fk'
+Fk_func._nu = 0
 
 # below is all for testing purposes
 
 
-def eval_chi(Etest, b, item_num, R_ch, R_wk, postfix=''):
+def eval_chi(Etest, b, item_num, R_ch, R_wk, Z, N, postfix=''):
 
-    X0 = chi_0(b, E=Etest, R=R_ch)
-    X1 = chi_c1(b, E=Etest, R=R_ch)
-    X2 = chi_c2(b, E=Etest, R=R_ch)
-    Xso = chi_so(b, E=Etest, R=R_ch)
-    Xa = chi_a(b, E=Etest, R=R_wk)
+    X0  = chi_0  (b, Etest, R_ch, Z, N)
+    X1  = chi_c1 (b, Etest, R_ch, Z, N)
+    X2  = chi_c2 (b, Etest, R_ch, Z, N)
+    Xso = chi_so (b, Etest, R_ch, Z, N)
+    Xa  = chi_a  (b, Etest, R_wk, Z, N)
 
     dat = np.stack(
         (b, np.abs(X0), np.abs(X1), np.abs(X2), np.abs(Xso), np.abs(Xa)))
@@ -220,21 +220,21 @@ def eval_F(Etest, b, item_num, R_ch, R_wk, keep_jacobian=True, postfix=''):
         F1_int = b * scipy.special.jn(0, b) * F1_func(b, Etest, R_ch, R_wk)
         F2_int = b * scipy.special.jn(0, b) * F2_func(b, Etest, R_ch, R_wk)
         Fn_int = b * scipy.special.jn(1, b) * Fn_func(b, Etest, R_ch, R_wk)
-        Fkap_int = b * scipy.special.jn(0, b) * Fkap_func(b, Etest, R_ch, R_wk)
+        Fk_int = b * scipy.special.jn(0, b) * Fk_func(b, Etest, R_ch, R_wk)
     else:
         F1_int = F1_func(b, Etest, R_ch, R_wk)
         F2_int = F2_func(b, Etest, R_ch, R_wk)
         Fn_int = Fn_func(b, Etest, R_ch, R_wk)
-        Fkap_int = Fkap_func(b, Etest, R_ch, R_wk)
+        Fk_int = Fk_func(b, Etest, R_ch, R_wk)
 
     F0_int = F1_int + F2_int
 
     head_string = ("    b".ljust(25) + "    F0_r".ljust(25) +
                    "    F0_i".ljust(25) + "    Fn_r".ljust(25) +
-                   "    Fn_i".ljust(25) + "    Fkap_r".ljust(25) +
-                   "    Fkap_i".ljust(25))
+                   "    Fn_i".ljust(25) + "    Fk_r".ljust(25) +
+                   "    Fk_i".ljust(25))
     dat = np.stack((b, F0_int.real, F0_int.imag, Fn_int.real, Fn_int.imag,
-                    Fkap_int.real, Fkap_int.imag))
+                    Fk_int.real, Fk_int.imag))
 
     fname = 'data/profile_funcs/Fintegrand_OY'
     np.savetxt(fname+postfix+'.txt', dat.T, header=head_string)
