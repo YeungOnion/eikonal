@@ -194,11 +194,11 @@ Fk_func._nu = 0
 
 def eval_chi(Etest, b, item_num, R_ch, R_wk, postfix=''):
 
-    X0  = chi_0 (b, E=Etest, R=R_ch, Z, N)
-    X1  = chi_c1(b, E=Etest, R=R_ch, Z, N)
-    X2  = chi_c2(b, E=Etest, R=R_ch, Z, N)
-    Xso = chi_so(b, E=Etest, R=R_ch, Z, N)
-    Xa  = chi_a (b, E=Etest, R=R_wk, Z, N)
+    X0  = chi_0 (b, Etest, R_ch, Z, N)
+    X1  = chi_c1(b, Etest, R_ch, Z, N)
+    X2  = chi_c2(b, Etest, R_ch, Z, N)
+    Xso = chi_so(b, Etest, R_ch, Z, N)
+    Xa  = chi_a (b, Etest, R_wk, Z, N)
 
     dat = np.stack(
         (b, np.abs(X0), np.abs(X1), np.abs(X2), np.abs(Xso), np.abs(Xa)))
