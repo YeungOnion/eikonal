@@ -88,7 +88,7 @@ def chi_c2(b, E, R, Z, N):
 
 
 def chi_c(b, E, R, Z, N):
-    return chi_c1(b, E, R) + chi_c2(b, E, R, Z, N)
+    return chi_c1(b, E, R, Z, N) + chi_c2(b, E, R, Z, N)
 
 
 def chi_so(b, E, R, Z, N):
@@ -137,9 +137,9 @@ def f0_func(q, E, R_ch, R_wk, use_ratio=True):
 
 def F0_func(b, E, R_ch, R_wk):
     kap = np.sqrt(E**2 - m_**2)
-    phase_factor = np.exp(-chi_0(b, E, R_ch), Z, N)
+    phase_factor = np.exp(-chi_0(b, E, R_ch, Z, N))
     coef = 1j * kap
-    return coef * phase_factor * (1 - np.exp(-chi_c(b, E, R_ch)), Z, N)
+    return coef * phase_factor * (1 - np.exp(-chi_c(b, E, R_ch, Z, N)))
 
 
 F0_func._name = r'F0'
@@ -148,9 +148,9 @@ F0_func._nu = 0
 
 def F1_func(b, E, R_ch, R_wk):
     kap = np.sqrt(E**2 - m_**2)
-    phase_factor = np.exp(-chi_0(b, E, R_ch), Z, N)
+    phase_factor = np.exp(-chi_0(b, E, R_ch, Z, N))
     coef = 1j * kap
-    return coef * phase_factor * (1 - np.exp(-chi_c1(b, E, R_ch)), Z, N)
+    return coef * phase_factor * (1 - np.exp(-chi_c1(b, E, R_ch, Z, N)))
 
 
 F1_func._name = r'F1'
@@ -159,9 +159,9 @@ F1_func._nu = 0
 
 def F2_func(b, E, R_ch, R_wk):
     kap = np.sqrt(E**2 - m_**2)
-    phase_factor = np.exp(-chi_0(b, E, R_ch) - chi_c1(b, E, R_ch), Z, N)
+    phase_factor = np.exp(-chi_0(b, E, R_ch, Z, N) - chi_c1(b, E, R_ch, Z, N))
     coef = 1j * kap
-    return coef * phase_factor * (1 - np.exp(-chi_c2(b, E, R_ch)), Z, N)
+    return coef * phase_factor * (1 - np.exp(-chi_c2(b, E, R_ch, Z, N)))
 
 
 F2_func._name = r'F2'
@@ -170,7 +170,7 @@ F2_func._nu = 0
 
 def Fn_func(b, E, R_ch, R_wk):
     kap = np.sqrt(E**2 - m_**2)
-    phase_factor = np.exp(-chi_0(b, E, R_ch) - chi_c(b, E, R_ch), Z, N)
+    phase_factor = np.exp(-chi_0(b, E, R_ch, Z, N) - chi_c(b, E, R_ch, Z, N))
     coef = -kap
     return coef * phase_factor * chi_so(b, E, R_ch, Z, N)
 
@@ -181,24 +181,24 @@ Fn_func._nu = 1
 
 def Fk_func(b, E, R_ch, R_wk):
     kap = np.sqrt(E**2 - m_**2)
-    phase_factor = np.exp(-(chi_0(b, E, R_ch) + chi_c(b, E, R_ch)), Z, N)
+    phase_factor = np.exp(-(chi_0(b, E, R_ch, Z, N) + chi_c(b, E, R_ch, Z, N)))
     coef = 1j * kap
     return coef * phase_factor * chi_a(b, E, R_wk, Z, N)
 
 
-Fk_func._name = r'Fk'
+Fk_func._name = r'Fkap'
 Fk_func._nu = 0
 
 # below is all for testing purposes
 
 
-def eval_chi(Etest, b, item_num, R_ch, R_wk, Z, N, postfix=''):
+def eval_chi(Etest, b, item_num, R_ch, R_wk, postfix=''):
 
-    X0  = chi_0  (b, Etest, R_ch, Z, N)
-    X1  = chi_c1 (b, Etest, R_ch, Z, N)
-    X2  = chi_c2 (b, Etest, R_ch, Z, N)
-    Xso = chi_so (b, Etest, R_ch, Z, N)
-    Xa  = chi_a  (b, Etest, R_wk, Z, N)
+    X0  = chi_0 (b, E=Etest, R=R_ch, Z, N)
+    X1  = chi_c1(b, E=Etest, R=R_ch, Z, N)
+    X2  = chi_c2(b, E=Etest, R=R_ch, Z, N)
+    Xso = chi_so(b, E=Etest, R=R_ch, Z, N)
+    Xa  = chi_a (b, E=Etest, R=R_wk, Z, N)
 
     dat = np.stack(
         (b, np.abs(X0), np.abs(X1), np.abs(X2), np.abs(Xso), np.abs(Xa)))
